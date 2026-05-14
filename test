@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# Inits (Even grid 8)
+grid_size=8
+ah=$(( grid_size /2 ))
+#      { 0 1 2 3 4 5 6 7 }
+l_Pos=(3 2 1 0 0 1 2 3) 
+r_Pos=(4 5 6 7 7 6 5 4)
+line="        "
+
+_call_error() {
+      local error_string="$1"
+      echo "${FUNCTNAME[@]},${error_string}" >&2
+  }
+
+replace_character()
+{
+    # Expects $line $index $chr
+    # Sanity Check:
+
+    # Wrong n of Args
+    # if [[ "$#" -eq 3 ]] || {
+    #   call_error" need 3 params" >&2 
+    #   return 1 
+    # }
+
+    # grab function Arguments after validating presence
+    in_line="$1"
+    in_index="$2"
+    in_char="$3"
+
+    # # line not 8 
+    # if [[ "${#in_line}" -eq 8 ]] || {
+    #   call_error '#$line insnt 8'
+    #   return 1
+    # }
+    #
+    # # bad index argument
+    # if [[ "${in_index}" ~= ^-?[0-9]+$ ]] || {
+    #   call_error "Type Error: Desired positive or negative int "
+    #   return 1 
+    # }
+    #
+    # # index oob   
+    # if [[ "${in_index}" -lt 0 || "${in_index}" -gt 7 ]] && { 
+    #   call_error "Boundary Error: ${index} : [0,8)"
+    #   return 1
+    # }
+    #
+    # # char not 1 len
+    # if [[  ${#char} -ne 1 ]] && {
+    #   call_error "Type Error: Desired single char"
+    #   return 1
+    # }
+    # Passed all error tests ( TODO: Modulate these tests)
+    out_line="${in_line:0:$in_index}$in_char${in_line:$(($in_index + 1))}"
+    echo "$out_line"
+}
+
+basegrid(){
+    local lchr="/"
+    local rchr="\\"
+    
+
+    for ((i=0; i < grid_size ; i++)); do
+        # flip before middle
+        (( i == ah )) && {
+            local tval="$rchr"
+            rchr="$lchr"
+            lchr="$tval"
+        }
+        # copy base line
+        local tline="$line"
+        tline="$(replace_character "$tline" "${l_Pos[$i]}" "$lchr")"
+        tline="$(replace_character "$tline" "${r_Pos[$i]}" "$rchr")"
+        echo "$tline"
+    done
+}
+basegrid
