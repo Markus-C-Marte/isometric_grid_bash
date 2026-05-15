@@ -3,6 +3,9 @@
 # Validation helpers for grid diamond tile generation
 # Each validator returns 0 (pass) or 1 (fail)
 
+[[ -z "${_VALIDATORS_SOURCED}" ]] || return 0
+_VALIDATORS_SOURCED=1
+
 # Checks that every argument passed is non-empty.
 # Globals: none
 # Args: variable arguments to check
@@ -27,9 +30,9 @@ validators::is_integer() {
     done
 }
 
-# Check if $1 is within bounds. With 1 arg: [0, 7]. With 2 args: equal check.
+# Check if $1 is within bounds. With 1 arg: [0, grid_size-1] (defaults to 8). With 2 args: equal check.
 # With 3 args: [$2, $3] inclusive.
-# Globals: none
+# Globals: grid_size (optional; defaults to 8 if not set)
 # Args: $1=value; $2=lower_bound (optional); $3=upper_bound (optional)
 # Output: error message to stderr on invalid arg count
 # Returns: 0 if in bounds, 1 otherwise
@@ -37,12 +40,13 @@ validators::is_in_bounds() {
     validators::is_set "$@" || return 1
     validators::is_integer "$@" || return 1
     local tval lbound ubound
+    local grid_size="${grid_size:-8}"
 
     case $# in
         1)
             tval="$1"
             lbound=0
-            ubound=7
+            ubound=$((grid_size - 1))
             ;;
         2)
             tval="$1"
